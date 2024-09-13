@@ -5,10 +5,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
@@ -53,8 +51,7 @@ public class VacationService {
     // Создаем стрим для дат между началом и концом отпуска и фильтруем нерабочие дни
     private static int getNumberOfWorkingDaysByDates(LocalDate startDate, LocalDate endDate) {
         return (int) Stream.
-                iterate(startDate, date -> date.plusDays(1))
-                .limit(ChronoUnit.DAYS.between(startDate, endDate) + 1)
+                iterate(startDate, date -> !date.isAfter(endDate), date -> date.plusDays(1))
                 .filter(date -> isWorkingDay(date, getHolidays(startDate)))
                 .count();
     }

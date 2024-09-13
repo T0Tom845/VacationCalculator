@@ -38,7 +38,7 @@ public class VacationControllerTest {
     }
 
     @Test
-    @DisplayName("calculateVacationPay принял кол-во дней, вернет сумму отпускных")
+    @DisplayName("1 calculateVacationPay принял кол-во дней, вернет сумму отпускных")
     void calculateVacationPay_RequestIsValidNumberOfDaysSent_ResponseIsOk() throws Exception {
         when(vacationService.calculateVacationPay(100,10, null, null)).thenReturn(1000.0);
         mockMvc.perform(MockMvcRequestBuilders.get("/calculate")
@@ -50,7 +50,7 @@ public class VacationControllerTest {
     }
 
     @Test
-    @DisplayName("calculateVacationPay принял даты, вернет сумму отпускных")
+    @DisplayName("2 calculateVacationPay принял даты, вернет сумму отпускных")
     void calculateVacationPay_RequestIsValidDatesSent_ResponseIsOk() throws Exception {
         when(vacationService.calculateVacationPay(100,0,
                 LocalDate.parse("01.09.2024", DateTimeFormatter.ofPattern("dd.MM.yyyy")),
@@ -64,11 +64,37 @@ public class VacationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("1100.0"));
     }
-
     @Test
-    @DisplayName("calculateVacationPay запрос без параметров возвращает ошибку")
+    @DisplayName("3 calculateVacationPay запрос без параметров возвращает ошибку")
     void calculateVacationPay_RequestWithoutParameters_ReturnsBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/calculate"))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("4 calculateVacationPay запрос с негативной зарплатой")
+    void calculateVacationPay_NegativeSalary_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/calculate")
+                        .param("averageSalary", "-100")
+                        .param("startDate", "01.09.2024")
+                        .param("endDate", "16.09.2024"))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("5 calculateVacationPay запрос с датой начала после даты конца")
+    void calculateVacationPay_StartDateIsAfterEndDate_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/calculate")
+                        .param("averageSalary", "-100")
+                        .param("startDate", "16.09.2024")
+                        .param("endDate", "01.09.2024"))
+                .andExpect(status().isBadRequest());
+    }
+    @Test
+    @DisplayName("6 calculateVacationPay запрос без даты конца")
+    void calculateVacationPay_EndDateAbsent_ReturnsBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/calculate")
+                        .param("averageSalary", "-100")
+                        .param("startDate", "16.09.2024")
+                        )
                 .andExpect(status().isBadRequest());
     }
 }

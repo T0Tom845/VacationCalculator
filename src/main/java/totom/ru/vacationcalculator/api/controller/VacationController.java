@@ -25,15 +25,26 @@ public class VacationController {
         startDate и endDate не дадут и наоборот. Если не дали все три бросить ошибку
      */
     @GetMapping("/calculate")
-    public ResponseEntity<Double> calculateVacationPay(
+    public ResponseEntity<String> calculateVacationPay(
             @RequestParam double averageSalary,
             @RequestParam(required = false) Integer numberOfDays,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, fallbackPatterns = { "M/d/yy", "dd.MM.yyyy" }) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE, fallbackPatterns = { "M/d/yy", "dd.MM.yyyy" }) LocalDate endDate)
     {
-        if (numberOfDays == null && (startDate == null || endDate == null)) return ResponseEntity.badRequest().body(null); //Неверный запрос, отсутствуют необходимые параметры
+        if ( averageSalary <= 0 )
+            return ResponseEntity.badRequest().body("Bad request: Negative average salary value"); //Неверный запрос, негативная зарплата
+        if (numberOfDays != null){
+            if (numberOfDays < 0) return ResponseEntity.badRequest().body("Bad request: Negative Number of days value"); //Неверный запрос, негативная количество дней
+        }
+        if (numberOfDays == null && ((startDate == null || endDate == null)))
+            return ResponseEntity.badRequest().body("Bad request: Required arguments is missing"); //Неверный запрос, отсутствуют необходимые параметры
+        if (startDate != null && endDate != null){
+            if ((startDate.isAfter(endDate))) //Неверный запрос, дата начала позже даты конца
+                return ResponseEntity.badRequest().body("Bad request: Start date is after End date");
+        }
+
         double vacationPay = vacationService.calculateVacationPay(averageSalary, numberOfDays != null ? numberOfDays : 0, startDate, endDate);
-        return ResponseEntity.ok(vacationPay);
+        return ResponseEntity.ok(Double.toString(vacationPay));
     }
 
 }

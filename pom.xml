@@ -5,20 +5,20 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.11</version>
+        <version>3.3.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>totom.ru</groupId>
     <artifactId>VacationCalculator</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Vacation calculator</name>
-    <description>Vacation calculator</description>
+    <name>Vacation_calculator</name>
+    <description>Vacation_calculator</description>
     <packaging>jar</packaging>
 
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot.version>2.7.11</spring-boot.version>
+        <spring-boot.version>3.3.3</spring-boot.version>
     </properties>
     <dependencies>
         <dependency>
